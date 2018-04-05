@@ -7,18 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class Problem2 {
+public class Problem2Tests {
 
     public int solution(Tree T) {
         if (T == null) {
             return 0;
         }
         // Use traverse() to
-        //   - obtain the maximum value of all the 'x' values in the tree (for test data: 6)
-        //   - build a list of nodes in the order we want to process them. A node is a little wrapper that contains
+        //   * Obtain the maximum value of all the 'x' values in the tree (for test data: 6)
+        //
+        //   * Build a list of nodes in the order we want to process them. A node is a little wrapper that contains
         //     the Tree object and the depth level of that particular element.
         //
-        // Note the nodeList we build for the sample data looks like this: A1, B2, D3, D4, C2, E3, F3
+        // Note the nodeList we build for the sample data looks like this: A1, B2, D3, G4, C2, E3, F3
         //
         List<Node> nodeList = new ArrayList<>();
         int maxTreeVal = traverse(T, nodeList);
@@ -149,15 +150,51 @@ public class Problem2 {
 
 
     @Test
-    public void testSolution() {
-        Tree tree = buildSampleData();
+    public void testSolutionWithSampleData3() {
+        Tree tree = buildSampleData3();
+        int res = solution(tree);
+        Assert.assertEquals(3, res);
+    }
+
+    @Test
+    public void testSolutionWithSampleData4() {
+        Tree tree = buildSampleData4();
         int res = solution(tree);
         Assert.assertEquals(4, res);
-
     }
+
+
+    @Test
+    public void testSolutionWithSampleData1() {
+        Tree tree = buildSampleData1();
+        int res = solution(tree);
+        Assert.assertEquals(1, res);
+    }
+
+    @Test
+    public void testSolutionWithSampleData2() {
+        Tree tree = buildSampleData2();
+        int res = solution(tree);
+        Assert.assertEquals(2, res);
+    }
+
+
+    @Test
+    public void testSolutionWithNullData() {
+        int res = solution(null);
+        Assert.assertEquals(0, res);
+    }
+
+    @Test
+    public void testSolutionWithOneElement() {
+        int res = solution(new Tree(5));
+        Assert.assertEquals(1, res);
+    }
+
+
     @Test
     public void testTraverse3() {
-        Tree tree = buildSampleData();
+        Tree tree = buildSampleData3();
         List<Node> nodeList = new ArrayList<>();
         int maxValue = traverse(tree, nodeList);
         Assert.assertEquals(6, maxValue);
@@ -171,7 +208,7 @@ public class Problem2 {
         }
     }
 
-    Tree buildSampleData() {
+    Tree buildSampleData3() {
         Tree a = new Tree(4);
         Tree b = new Tree(5);
         Tree d = new Tree(4);
@@ -190,6 +227,75 @@ public class Problem2 {
         return a;
 
     }
+
+    Tree buildSampleData4() {
+        Tree a = new Tree(4);
+        Tree b = new Tree(5);
+        Tree d = new Tree(4);
+        Tree g = new Tree(5);
+        Tree c = new Tree(6);
+        Tree e = new Tree(1);
+        Tree f = new Tree(6);
+        Tree h = new Tree(5);
+        Tree i = new Tree(5);
+
+        a.l = b;
+        b.l = d;
+        d.l = g;
+        a.r = c;
+        c.l = e;
+        c.r = f;
+        e.r = h;
+        e.l = i;
+
+        return a;
+
+    }
+
+
+
+    Tree buildSampleData2() {
+        Tree a = new Tree(4);
+        Tree b = new Tree(5);
+        Tree d = new Tree(4);
+        Tree g = new Tree(5);
+        Tree c = new Tree(6);
+        Tree e = new Tree(4);
+        Tree f = new Tree(6);
+
+        a.l = b;
+        b.l = d;
+        d.l = g;
+        a.r = c;
+        c.l = e;
+        c.r = f;
+
+        return a;
+
+    }
+
+
+
+    Tree buildSampleData1() {
+        Tree a = new Tree(4);
+        Tree b = new Tree(4);
+        Tree d = new Tree(4);
+        Tree g = new Tree(4);
+        Tree c = new Tree(4);
+        Tree e = new Tree(4);
+        Tree f = new Tree(4);
+
+        a.l = b;
+        b.l = d;
+        d.l = g;
+        a.r = c;
+        c.l = e;
+        c.r = f;
+
+        return a;
+
+    }
+
 
     public static class Tree {
         int x;
