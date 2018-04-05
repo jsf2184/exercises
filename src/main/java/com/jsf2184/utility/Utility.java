@@ -2,7 +2,6 @@ package com.jsf2184.utility;
 
 import org.apache.log4j.Logger;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -106,8 +105,15 @@ public class Utility {
     }
 
     public static void logArray(int arr[][]) {
-        for (int i=0; i<arr.length; i++) {
-            _log.info(Arrays.toString(arr[i]));
+        for (int[] anArr : arr) {
+            _log.info(Arrays.toString(anArr));
+        }
+    }
+
+    public static void sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ignore) {
         }
     }
 
