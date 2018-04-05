@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import static com.jsf2184.threads.ConcurrencyPlay.sleep;
 
 public class WaitTests {
 
@@ -44,7 +43,7 @@ public class WaitTests {
         boolean _empty = true;
 
         public synchronized void publish() {
-            sleep(5);
+            Utility.sleep(5);
             // publisher uses waitSignal() to wait until the _empty flag is true, meaning that a consumer has
             // retrieved the last value that was published.
             //
@@ -141,7 +140,7 @@ public class WaitTests {
     public void testLockstep() throws InterruptedException {
         ReliablePubValue reliablePubValue = new ReliablePubValue();
         Thread producerThread = new Thread(
-                () -> IntStream.range(0, 100).forEach(x -> { reliablePubValue.publish(); })
+                () -> IntStream.range(0, 100).forEach(x -> reliablePubValue.publish())
         );
         producerThread.start();
 
