@@ -30,6 +30,7 @@ public class WaitTests {
             // We want to wait until there is a new value past what we saw earlier
             while (_value <= prior) {
                 try {
+                    // wait for the other thread to notify.
                     wait();
                 } catch (InterruptedException ignore) {
                 }

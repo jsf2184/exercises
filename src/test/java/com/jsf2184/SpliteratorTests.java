@@ -7,9 +7,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
@@ -19,8 +17,8 @@ public class SpliteratorTests {
 
     private static final Logger _log = Logger.getLogger(SpliteratorTests.class);
     ConcurrentMap<Integer, Integer> _concurrentMap;
-    ArrayList<Integer> _inputs;
-    ArrayList<Spliterator<Integer>> _spliterators;
+    List<Integer> _inputs;
+//    List<Spliterator<Integer>> _spliterators;
 
 
     @BeforeClass
@@ -36,48 +34,98 @@ public class SpliteratorTests {
         for (int i=0; i<131072; i++) {
             _inputs.add(i);
         }
-        _spliterators = new ArrayList<>();
-        Spliterator<Integer> spliterator = _inputs.spliterator();
-        makeSpliterators(8, spliterator);
+//        _spliterators = createSpliteratorsRecursive(8, _inputs);
 
     }
 
-    public void makeSpliterators(int depth, Spliterator<Integer> src) {
+    @Test
+    public void testCreateSpliteratorWithStack() {
+        verifyCreateSpliterators(_inputs, 8);
+    }
+
+    public void verifyCreateSpliterators(List<Integer> inputs, int depth) {
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(depth, inputs);
+        int divisor = (int) Math.pow(2, depth);
+        int expectedSize = inputs.size() / divisor;
+        spliterators.forEach(s -> Assert.assertEquals(expectedSize, s.getExactSizeIfKnown()));
+    }
+
+    public static List<Spliterator<Integer>> createSpliteratorsWithStack(int depth, List<Integer> inputs) {
+        Stack<Spliterator<Integer>> stack = new Stack<>();
+        Stack<Integer> depthStack = new Stack<>();
+        List<Spliterator<Integer>> res = new ArrayList<>();
+
+        Spliterator<Integer> src = inputs.spliterator();
+        depthStack.push(depth);
+        stack.push(src);
+
+        while (!stack.isEmpty()) {
+            depth = depthStack.pop();
+            src = stack.pop();
+            if (depth == 0) {
+                res.add(src);
+            } else {
+                Spliterator<Integer> other = src.trySplit();
+                stack.push(src);
+                depthStack.push(depth-1);
+                stack.push(other);
+                depthStack.push(depth-1);
+            }
+        }
+        return res;
+    }
+
+
+    public static List<Spliterator<Integer>> createSpliteratorsRecursive(int depth, List<Integer> inputs) {
+        List<Spliterator<Integer>> res = new ArrayList<>();
+        Spliterator<Integer> spliterator = inputs.spliterator();
+        createSpliteratorsRecursive(depth, spliterator, res);
+        return res;
+    }
+    public static void createSpliteratorsRecursive(int depth,
+                                                   Spliterator<Integer> src,
+                                                   List<Spliterator<Integer>> spliterators) {
         if (depth == 0) {
-            _spliterators.add(src);
+            spliterators.add(src);
             return;
         }
         Spliterator<Integer> copy = src.trySplit();
-        makeSpliterators(depth-1, src);
-        makeSpliterators(depth-1, copy);
+        createSpliteratorsRecursive(depth-1, src, spliterators);
+        createSpliteratorsRecursive(depth-1, copy, spliterators);
     }
 
     @Test
     public void test512SpliteratorsSequentially() {
-        _log.info(String.format("There are %d spliterators", _spliterators.size()));
-        _spliterators.forEach(s -> _log.info(String.format("Spliterator has %d elements", s.getExactSizeIfKnown())));
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(8, _inputs);
+
+        int numSpliterators = spliterators.size();
+        _log.info(String.format("There are %d spliterators", numSpliterators));
+        spliterators.forEach(s -> _log.info(String.format("Spliterator has %d elements", s.getExactSizeIfKnown())));
 
         AtomicInteger spidx = new AtomicInteger();
-        _spliterators.forEach(sp ->
+        spliterators.forEach(sp ->
         {
             spidx.incrementAndGet();
             sp.forEachRemaining(i->_concurrentMap.put(i, spidx.intValue() ));
         });
 
-        validateMap();
+        validateMap(numSpliterators);
     }
 
     @Test
     public void test512SpliteratorsParallel() throws InterruptedException {
-        _log.info(String.format("There are %d spliterators", _spliterators.size()));
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(8, _inputs);
+        int numSpliterators = spliterators.size();
+
+        _log.info(String.format("There are %d spliterators", numSpliterators));
         AtomicInteger i= new AtomicInteger();
-        CountDownLatch latch = new CountDownLatch(_spliterators.size());
-        _spliterators.stream().map(s -> new Worker(i.getAndIncrement(), s, latch)).forEach(Thread::start);
+        CountDownLatch latch = new CountDownLatch(spliterators.size());
+        spliterators.stream().map(s -> new Worker(i.getAndIncrement(), s, latch)).forEach(Thread::start);
         latch.await();
-        validateMap();
+        validateMap(numSpliterators);
     }
 
-    public void validateMap() {
+    public void validateMap(int numSpliterators) {
         HashMap<Integer, Integer> spliteratorCounts = new HashMap<>();
 
         // verify that every input is in the spliterator map and count the
@@ -88,7 +136,7 @@ public class SpliteratorTests {
             Assert.assertNotNull(splitId);
             spliteratorCounts.merge(splitId, 1, (o, n) -> o+n);
         });
-        Integer expectedSize = _inputs.size() / _spliterators.size();
+        Integer expectedSize = _inputs.size() / numSpliterators;
         spliteratorCounts.values().forEach(v -> Assert.assertEquals(expectedSize, v));
     }
 

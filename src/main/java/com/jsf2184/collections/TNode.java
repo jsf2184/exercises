@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.Stack;
+import java.util.function.Supplier;
 
 public class TNode {
 
@@ -83,20 +84,19 @@ public class TNode {
         return root;
     }
 
-    public static TNode buildDepthTree2(int maxDepth) {
+    public static TNode buildDepthTree2(int maxDepth, Supplier<Integer> valProvider) {
         Stack<TNode> stack = new Stack<>();
         Stack<Integer> dstack = new Stack<>();
         if (maxDepth <= 0) {
             return null;
         }
-        int val = 1;
-        TNode root = new TNode(val++);
+        TNode root = new TNode(valProvider.get());
         TNode node = root;
         int d = 1;
 
         while(true) {
             while (d < maxDepth) {
-                TNode left = new TNode(val++);
+                TNode left = new TNode(valProvider.get());
                 node.setLeft(left);
                 stack.push(node);
                 dstack.push(d);
@@ -110,7 +110,7 @@ public class TNode {
             node = stack.pop();
             d = dstack.pop();
 
-            TNode right = new TNode(val++);
+            TNode right = new TNode(valProvider.get());
             node.setRight(right);
             node = right;
             d++;

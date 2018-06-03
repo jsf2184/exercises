@@ -6,6 +6,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class TNodeTests {
     private static final Logger _log = Logger.getLogger(TNodeTests.class);
 
@@ -33,7 +35,8 @@ public class TNodeTests {
     }
     @Test
     public void testDepthTreeBuild2() {
-        TNode tree = TNode.buildDepthTree2(4);
+        AtomicInteger valProvider = new AtomicInteger(0);
+        TNode tree = TNode.buildDepthTree2(4, valProvider::getAndIncrement);
         Assert.assertNotNull(tree);
         TNode.traverseDepthTree(tree, (v) -> _log.info("" + v));
 
