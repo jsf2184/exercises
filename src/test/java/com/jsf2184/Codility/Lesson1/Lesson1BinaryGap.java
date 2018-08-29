@@ -37,4 +37,38 @@ public class Lesson1BinaryGap {
         return  longestGap;
     }
 
+    @Test
+    public void testWithStream() {
+        Assert.assertEquals(4, getLongest2(529));
+        Assert.assertEquals(2, getLongest2(9));
+        Assert.assertEquals(1, getLongest2(20));
+        Assert.assertEquals(0, getLongest2(0b001000));
+        Assert.assertEquals(4, getLongest2(0b00100100001));
+        Assert.assertEquals(6, getLongest2(0b100000010010001));
+    }
+
+    public static int getLongest2(int N) {
+
+        int mask = 1;
+        int longestSequence = 0;
+        Integer currentSeqLen = null;
+
+        for (int i=0; i< Integer.SIZE; i++) {
+            System.out.println(mask);
+            boolean bit = (N & mask) != 0;
+            if (bit) {
+                if (currentSeqLen != null) {
+                    longestSequence = Integer.max(longestSequence, currentSeqLen);
+                }
+                currentSeqLen = 0;
+            } else if (currentSeqLen != null) {
+                currentSeqLen++;
+            }
+            mask = mask << 1;
+
+        }
+        return longestSequence;
+
+    }
+
 }

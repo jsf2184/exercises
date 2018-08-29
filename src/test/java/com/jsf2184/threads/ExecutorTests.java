@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.rmi.CORBA.Util;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +28,24 @@ public class ExecutorTests {
     public static class Job {
         CountDownLatch _latch;
         private int _id;
+        private Integer _exceptionMod;
 
         public Job(CountDownLatch latch, int id) {
+            this(latch, id, null);
+        }
+
+        public Job(CountDownLatch latch, int id, Integer exceptionMod) {
             _latch = latch;
             _id = id;
+            _exceptionMod = exceptionMod;
         }
 
         public void run() {
             System.out.printf("Job.run(): %d, My thread is named %s\n", _id, Thread.currentThread().getName());
+            if (_exceptionMod != null && _id % _exceptionMod == 0) {
+                _latch.countDown();
+                throw new RuntimeException(String.format("JobExecution for id = %d", _id));
+            }
             Utility.sleep(100);
             _latch.countDown();
         }
@@ -52,15 +63,25 @@ public class ExecutorTests {
     public void testSingleThreadExecutorWithSubmits() throws InterruptedException {
         // A SingleThreadExecutor only uses one thread, so there are all done one at a time.
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        submit(executorService, 100);
+        submit(executorService, 100, null);
     }
 
     @Test
     public void testFixedThreadPoolWithSubmits() throws InterruptedException {
         // Now we use an ExecutorService that uses 5 threads at a time.
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        submit(executorService, 100);
+        submit(executorService, 100, 19);
+
     }
+
+    @Test
+    public void testCachedThreadPoolWithSubmits() throws InterruptedException {
+        // Now we use an ExecutorService that uses 5 threads at a time.
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        submit(executorService, 100, 19);
+
+    }
+
 
     @Test
     public void testFixedThreadPoolWithFutures() throws InterruptedException, ExecutionException {
@@ -71,15 +92,34 @@ public class ExecutorTests {
     // Submit 'count' jobs to the ExecutorService. In this submit() method, our 'job' is basically that of a
     // 'Runnable'. That is, it is just a void method, returning nothing. I use a Countdown latch to
     //
-    public void submit(ExecutorService executorService, int count) throws InterruptedException {
+    public void submit(ExecutorService executorService,
+                       int count,
+                       Integer exceptionMod) throws InterruptedException
+    {
         CountDownLatch latch = new CountDownLatch(count);
+        HashMap<Integer, Future<?>> futures = new HashMap<>();
         IntStream.range(0, count).forEach(i -> {
-            Job job = new Job(latch, i);
+            Job job = new Job(latch, i, exceptionMod);
             // this overload of submit() returns nothing.
-            executorService.submit(job::run);
+            Future<?> future = executorService.submit(job::run);
+            futures.put(i, future);
         });
         latch.await();
         executorService.shutdown();
+        for (Map.Entry<Integer, Future<?>> pair : futures.entrySet()) {
+            Integer i = pair.getKey();
+            try {
+                Future<?> future = pair.getValue();
+                Object o = future.get();
+                Assert.assertNull(o);
+            } catch (ExecutionException e) {
+                Throwable causeException = e.getCause();
+                _log.warn(String.format("For value: %d, Caught ExecutionException: %s - %s",
+                                        i,
+                                        causeException.getClass().getSimpleName(),
+                                        causeException.getMessage()));
+            }
+        }
     }
 
     // Here we submit Callables to the ExecutorService. Each Callable returns a value (an Integer) when it is finished.

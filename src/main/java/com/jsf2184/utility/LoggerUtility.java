@@ -6,7 +6,7 @@ public class LoggerUtility
 {
     static public void initRootLogger() {
         Logger logger = Logger.getRootLogger();
-        PatternLayout layout = new PatternLayout("%d %-5p %m%n");
+        PatternLayout layout = new PatternLayout("%d %-5p %t %m%n");
         ConsoleAppender appender = new ConsoleAppender(layout);
         logger.addAppender(appender);
         logger.setLevel(Level.INFO);

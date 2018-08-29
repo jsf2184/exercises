@@ -70,6 +70,32 @@ public class Lesson2CyclicRotation {
         callRotate1(new int[] {1,2},
                     new int[] {2,1});
     }
+    @Test
+    public void testRotate1A() {
+        callRotate1A(new int[] {0, 1, 2, 3, 4, 5},
+                     new int[] {5, 0, 1, 2, 3, 4});
+    }
+
+    @Test
+    public void testRotate1AWithEmpty() {
+        callRotate1A(new int[] {},
+                    new int[] {});
+
+    }
+
+    @Test
+    public void testRotate1AWithOneElement() {
+        callRotate1A(new int[] {1},
+                    new int[] {1});
+    }
+
+    @Test
+    public void testRotate1AWithTwoElements() {
+        callRotate1A(new int[] {1,2},
+                    new int[] {2,1});
+    }
+
+
 
     @Test
     public void testSolution() {
@@ -108,6 +134,13 @@ public class Lesson2CyclicRotation {
         Assert.assertTrue(Arrays.equals(expected, input));
     }
 
+    private void callRotate1A(int[] input, int[] expected) {
+        System.out.printf("input: %s\n", Arrays.toString(input));
+        rotate1A(input);
+        System.out.printf("output: %s\n", Arrays.toString(input));
+        Assert.assertTrue(Arrays.equals(expected, input));
+    }
+
     public void rotate1(int[] A) {
 
         if (A.length <= 1) {
@@ -120,5 +153,18 @@ public class Lesson2CyclicRotation {
             A[dest] = A[src];
         }
         A[1] = temp;
+    }
+
+    public void rotate1A(int[] A) {
+
+        int last = A.length - 1;
+        if (last <= 0) {
+            return;
+        }
+        int temp = A[last];
+        for (int dest = last; dest > 0; dest--) {
+            A[dest] = A[dest-1];
+        }
+        A[0] = temp;
     }
 }
