@@ -16,10 +16,14 @@ public class GroupingTests {
 
     @Test
     public void testOneLevelGroup() {
-        Map<String, List<Employee>> map = Employee.createEmployees(10)
+        List<Employee> employees = Employee.createEmployees(10);
+        System.out.println("Here is the list of employees");
+        Employee.createEmployees(10).forEach(System.out::println);
+        Map<String, List<Employee>> map = employees
                 .stream()
                 .collect(Collectors.groupingBy(Employee::getFirstName));
 
+        System.out.println("\nHere is the map of employees, grouping by name");
         map.entrySet().forEach(System.out::println);
     }
 

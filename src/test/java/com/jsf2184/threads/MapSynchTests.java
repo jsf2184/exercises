@@ -1,5 +1,6 @@
 package com.jsf2184.threads;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
@@ -8,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MapSynchTests {
@@ -30,8 +30,14 @@ public class MapSynchTests {
         return res;
     }
 
+    Map<Integer, Integer> createHashTable(int n) {
+        Map<Integer, Integer> res = new Hashtable<>();
+        addToMap(res, 0, n);
+        return res;
+    }
+
     void addToMap(Map<Integer, Integer> map,  int start, int end) {
-        IntStream.range(start, end).forEach(i -> {map.put(i, i*i);});
+        IntStream.range(start, end).forEach(i -> map.put(i, i*i));
     }
 
     public Integer getMaxLoop(Map<Integer, Integer> map, AtomicInteger catchCount) {
@@ -65,16 +71,55 @@ public class MapSynchTests {
         runConcurrentWriterAndReaders(map);
     }
 
+    @Test
+    public void testConcurrentWriterAndReadersWithHashTable() throws  Exception {
+        Map<Integer, Integer> map = createHashTable(100000);
+        runConcurrentWriterAndReaders(map);
+    }
+
+    @Test
+    public void testDeleteFromHashMapWhileIterating() {
+        Map<Integer, Integer> map = createMap(100);
+        testDeleteWhileRemoving(map, "HashMap");
+    }
+
+    @Test
+    public void testDeleteFromConcurrentHashMapWhileIterating() {
+        Map<Integer, Integer> map = createConcurrentMap(100);
+        testDeleteWhileRemoving(map, "HashMap");
+        Assert.assertEquals(50, map.size());
+        for (int i=1; i<100; i+=2) {
+            Integer val = map.get(i);
+            Assert.assertNotNull(val);
+        }
+    }
+
+    void testDeleteWhileRemoving(Map<Integer, Integer> map, String label) {
+        int res = 0;
+        try {
+            for (Integer key : map.keySet()) {
+                if (key % 2 == 0) {
+                    map.remove(key);
+                }
+            }
+        } catch (Exception ignore) {
+            res++;
+        }
+        System.out.printf("testDeleteWhileRemoving from %s, caught %d exceptions\n", label, res);
+    }
+
 
     public void runConcurrentWriterAndReaders(Map<Integer, Integer> map) throws  Exception {
         AtomicInteger catchCount = new AtomicInteger(0);
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(11);
         List<Future<Integer>> futures = new ArrayList<>();
-        executorService.submit(() -> {addToMap(map, 100000, 200000);});
+
+        // Start our writer who is writing w/ keys 100000 to 199999
+        executorService.submit(() -> addToMap(map, 100000, 200000));
+
+        // And start a bunch of readers
         for (int i=0; i< 10; i++) {
-            Future<Integer> future = executorService.submit(() -> {
-                return getMaxLoop(map, catchCount);
-            });
+            Future<Integer> future = executorService.submit(() -> getMaxLoop(map, catchCount));
             futures.add(future);
         }
         long largestAns = 0;

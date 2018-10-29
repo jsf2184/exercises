@@ -109,6 +109,7 @@ public class ExecutorTests {
         for (Map.Entry<Integer, Future<?>> pair : futures.entrySet()) {
             Integer i = pair.getKey();
             try {
+                // If there was a problem with a Job, a call to its future.get() would return an exception
                 Future<?> future = pair.getValue();
                 Object o = future.get();
                 Assert.assertNull(o);

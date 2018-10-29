@@ -6,12 +6,20 @@ import org.junit.Test;
 import java.util.*;
 import java.util.stream.IntStream;
 
+@SuppressWarnings({"WhileLoopReplaceableByForEach", "Java8CollectionRemoveIf"})
 public class LinkedListTests {
     LinkedList<Integer> populate(int n) {
         LinkedList<Integer> res = new LinkedList<>();
         IntStream.range(0, n).boxed().forEach(res::add);
         return res;
     }
+
+    LinkedList<Integer> populate2(int n) {
+        LinkedList<Integer> res = new LinkedList<>();
+        IntStream.range(0, n).boxed().forEach(res::add);
+        return res;
+    }
+
 
     public <T> void print(LinkedList<T> list) {
         Iterator<T> it = list.iterator();
@@ -28,8 +36,17 @@ public class LinkedListTests {
         }
     }
 
+    public <T> void delete2(LinkedList<T> list, T val) {
+        Iterator<T> it = list.iterator();
+        while (it.hasNext()) {
+            T elem = it.next();
+            if (elem.equals(val)) {
+                it.remove();
+            }
+        }
+    }
 
-    @SuppressWarnings("Java8CollectionRemoveIf")
+        @SuppressWarnings("Java8CollectionRemoveIf")
     public <T> void delete(LinkedList<T> list, T val) {
         Iterator<T> it = list.iterator();
         while (it.hasNext()) {

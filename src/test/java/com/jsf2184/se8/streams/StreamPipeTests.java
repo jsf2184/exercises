@@ -4,10 +4,7 @@ import com.jsf2184.se8.Person;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -25,6 +22,20 @@ public class StreamPipeTests {
         Assert.assertEquals(61, (int) map.get("Jeff"));
         Assert.assertEquals(62, (int) map.get("Caryn"));
     }
+
+    @Test
+    public void testListToMap2() {
+        List<Person> people = Person.createPersonList();
+        Map<String, Integer> map = people
+                .stream()
+                .collect(Collectors.toMap(Person::getName, Person::getAge));
+        Assert.assertEquals(4, map.size());
+        Assert.assertEquals(24, (int) map.get("Alex"));
+        Assert.assertEquals(22, (int) map.get("Zack"));
+        Assert.assertEquals(61, (int) map.get("Jeff"));
+        Assert.assertEquals(62, (int) map.get("Caryn"));
+    }
+
 
     @Test
     public void demoLazyStreams() {
@@ -49,6 +60,23 @@ public class StreamPipeTests {
     }
 
     @Test
+    public void testIntegerMapAndSum() {
+        List<Person> people = Person.createPersonList();
+        // Note that it returned a stream of Integer objects
+        int res = people.stream().map(Person::getAge).mapToInt(Integer::intValue).sum();
+        System.out.printf("total age of all people: %d\n", res);
+    }
+
+    @Test
+    public void testIntegerMapAndAvg() {
+        List<Person> people = Person.createPersonList();
+        // Note that it returned a stream of Integer objects
+        OptionalDouble average = people.stream().map(Person::getAge).mapToInt(Integer::intValue).average();
+        average.ifPresent(x -> System.out.printf("average is %f\n", x));
+    }
+
+
+    @Test
     public void testIntegerSummingWitoutIntConversion() {
         List<Person> people = Person.createPersonList();
         // Note that it returned a stream of Integer objects
@@ -61,6 +89,8 @@ public class StreamPipeTests {
         System.out.printf("total age of all people: %d\n", total);
     }
 
+
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void testIntegerSummingWhenListIsEmpty() {
         List<Person> people = new ArrayList<>();

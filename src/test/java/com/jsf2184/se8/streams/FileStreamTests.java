@@ -15,6 +15,7 @@ public class FileStreamTests {
     public void readFileTraditional() throws Exception {
         File resourceFile = ResourceUtility.getResourceFile("lineFile.txt");
         FileReader fileReader = new FileReader(resourceFile);
+
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         String line;
         while ((line = bufferedReader.readLine()) != null) {

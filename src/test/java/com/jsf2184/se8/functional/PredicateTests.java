@@ -18,12 +18,29 @@ public class PredicateTests {
         return res;
     }
 
-    @Test
-    public void testPredicateCalling() {
-        Assert.assertTrue(callPredicate((i) -> {return i% 2 == 0;}, 4));
-        Assert.assertFalse(callPredicate((i) -> {return i% 2 == 1;}, 4));
+    class PredLike // implements Predicate<Integer>
+    {
+        public boolean test(Integer i) {
+            return true;
+        }
     }
 
+    @Test
+    public void canAssignPredLikeToPredicate() {
+        PredLike predLike = new PredLike();
+        Assert.assertTrue(callPredicate(predLike::test, 3));
+    }
+    @Test
+    public void testPredicateCalling() {
+        Assert.assertFalse(callPredicate((i) -> i% 2 == 1, 4));
+
+        // If the lambda is only an expression, the 'return' is optional.
+        // Note when we do this, the curly brackets and semicolon must be removed also.
+        //
+        Assert.assertTrue(callPredicate((i) -> i% 2 == 0, 4));
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
     @Test
     public void testPredicateImplementedByStaticMethod() {
         Assert.assertTrue( callPredicate(i -> isEven(i), 2));
