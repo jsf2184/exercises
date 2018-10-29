@@ -1,7 +1,6 @@
 package com.jsf2184.socket;
 
 import org.apache.log4j.Logger;
-import sun.security.util.AuthResources_pt_BR;
 
 import java.io.*;
 import java.net.Socket;

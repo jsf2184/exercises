@@ -1,9 +1,7 @@
 package com.jsf2184.Codility.Lesson8;
 
-import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.security.util.AuthResources_it;
 
 import java.util.Stack;
 import java.util.stream.IntStream;
