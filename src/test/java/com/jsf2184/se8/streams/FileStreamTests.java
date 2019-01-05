@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.Buffer;
 import java.nio.file.Files;
+import java.util.stream.Stream;
 
 public class FileStreamTests {
 
@@ -26,7 +27,8 @@ public class FileStreamTests {
     @Test
     public void readFileWithStream() throws Exception {
         File resourceFile = ResourceUtility.getResourceFile("lineFile.txt");
-        Files.lines(resourceFile.toPath()).forEach(System.out::println);
+        Stream<String> fileStream = Files.lines(resourceFile.toPath());
+        fileStream.forEach(System.out::println);
     }
 
 }

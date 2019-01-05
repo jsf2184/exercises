@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class PrimitiveStreamTests {
 
@@ -22,18 +23,16 @@ public class PrimitiveStreamTests {
     @Test
     public void buildMap() {
 
-        Map<Integer, Integer> map = IntStream.range(0, 10).boxed().collect(Collectors.toMap(i -> i, i -> {
-            return i * i;
-        }));
+        Map<Integer, Integer> map = IntStream.range(0, 10).boxed().collect(Collectors.toMap(i -> i, i -> i * i));
 
-        map.entrySet().stream().forEach( e -> {System.out.printf("%d -> %d\n", e.getKey(), e.getValue());});
+        map.forEach((key, value) -> System.out.printf("%d -> %d\n", key, value));
 
-        map.forEach((k, v) -> {System.out.printf("%d -> %d\n", k, v);});
+        map.forEach((k, v) -> System.out.printf("%d -> %d\n", k, v));
     }
 
     public int[] createArray(int size) {
         int res[] = new int[size];
-        IntStream.range(0, size).forEach(i -> {res[i] = i;});
+        IntStream.range(0, size).forEach(i -> res[i] = i);
         return res;
     }
 
@@ -56,6 +55,23 @@ public class PrimitiveStreamTests {
 
         // Finally a really bad way to do it using reduce
         Optional<Long> reducedSum = Arrays.stream(array).asLongStream().boxed().reduce(Long::sum);
-        reducedSum.ifPresent(s -> {System.out.printf("reduced Sum is %d\n", s);});
+        reducedSum.ifPresent(s -> System.out.printf("reduced Sum is %d\n", s));
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    @Test
+    public void sumArrayStepByStepAsPrimitves() {
+        int[] array = createArray(10);
+        // Note that things stay as primitives throughout
+        IntStream intStream1 = Arrays.stream(array);
+        LongStream longStream1 = intStream1.asLongStream();
+        longStream1.forEach((long l) -> System.out.println(l) );
+
+        IntStream intStream2 = IntStream.of(array);
+        LongStream longStream2 = intStream2.asLongStream();
+        longStream2.forEach((long l) -> System.out.println(l) );
+
+        // Compiler error if try to take a LongStream directly of an int[] so the following has to be commented out
+//      LongStream longStream3 = LongStream.of(array)
     }
 }
