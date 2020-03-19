@@ -61,6 +61,17 @@ public class UtilityTests {
     }
 
     @Test
+    public void testSubstringEnd() {
+        String str = "abc";
+        Assert.assertEquals("abc", str.substring(0));
+        Assert.assertEquals("bc", str.substring(1));
+        Assert.assertEquals("c", str.substring(2));
+        Assert.assertEquals("", str.substring(3));
+
+
+    }
+
+    @Test
     public void testBadSplices() {
         verifyBadSplice(null, 0);
         verifyBadSplice("", 0);
@@ -79,6 +90,8 @@ public class UtilityTests {
     public void testPermute() {
         testPermute("abcd");
         testPermute("abc");
+        testPermute("ab");
+        testPermute("a");
     }
 
     @Test

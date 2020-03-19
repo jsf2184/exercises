@@ -1,6 +1,5 @@
 package com.jsf2184.utility;
 
-import com.jsf2184.SpliteratorTests;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.function.BiFunction;
 
 public class PriorityQueueTests {
     private static final Logger _log = Logger.getLogger(PriorityQueueTests.class);
@@ -22,18 +22,21 @@ public class PriorityQueueTests {
 
     @Test
     public void testPriorityQueue() {
-        PriorityQueue<Integer> sut = new PriorityQueue<>();
-        int[] shuffle = Utility.shuffle(10);
-        _log.info(String.format("input: %s", Arrays.toString(shuffle)));
-        Arrays.stream(shuffle).boxed().forEach(sut::add);
-        while (!sut.isEmpty()) {
-            Integer v = sut.remove();
-            _log.info("" + v);
-        }
+        // Default priority Queue has the root be the smallest so the values are
+        // stored in increasing order.
+        popAndPrintPriorityQueue((x, y) -> x - y );
     }
     @Test
     public void testReversePriorityQueue() {
-        PriorityQueue<Integer> sut = new PriorityQueue<>((x,y) -> x-y);
+        // Reverse PriorityQueue has the root be the largest so the values are stored in decreasing
+        // order.
+        popAndPrintPriorityQueue((x, y) -> y - x );
+
+    }
+
+    public void popAndPrintPriorityQueue(Comparator<Integer> comparer )
+    {
+        PriorityQueue<Integer> sut = new PriorityQueue<>(comparer);
         int[] shuffle = Utility.shuffle(10);
         _log.info(String.format("input: %s", Arrays.toString(shuffle)));
         Arrays.stream(shuffle).boxed().forEach(sut::add);
@@ -41,6 +44,7 @@ public class PriorityQueueTests {
             Integer v = sut.remove();
             _log.info("" + v);
         }
+
     }
 
     @Test
@@ -66,48 +70,55 @@ public class PriorityQueueTests {
     }
     public static class MedianArray {
         ArrayList<Integer> _list;
-        PriorityQueue<Integer> _increasing;
-        PriorityQueue<Integer> _decreasing;
+        // big numbers to on the increasing queue
+        PriorityQueue<Integer> _bigs;
+        // small numbers go on the decreeasing queue.
+        PriorityQueue<Integer> _smalls;
+
+        // the top of the decreasing queue should be just less than the
+        // top of the increasing queue.
 
         public MedianArray() {
             _list = new ArrayList<>();
-            _increasing = new PriorityQueue<>();
-            _decreasing = new PriorityQueue<>((x,y) -> y-x);
+            // default case is that the numbers increase
+            _bigs = new PriorityQueue<>();
+            // reverse case is that the numbers decrease.
+            _smalls = new PriorityQueue<>((x, y) -> y-x);
         }
 
         public Integer biggestSmall() {
 
-            return  _decreasing.peek();
+            return  _smalls.peek();
         }
         public Integer smallestBig() {
-            return  _increasing.peek();
+            return  _bigs.peek();
         }
 
         public void add(int v) {
             _list.add(v);
-            if (_increasing.size() == 0 && _decreasing.size() == 0) {
-                _increasing.add(v);
+            if (_bigs.size() == 0 && _smalls.size() == 0) {
+                _bigs.add(v);
                 return;
             }
-            if (v < _increasing.peek()) {
-                _decreasing.add(v);
+            if (v < _bigs.peek()) {
+                _smalls.add(v);
             } else {
-                _increasing.add(v);
+                _bigs.add(v);
             }
 
             PriorityQueue<Integer> longer;
             PriorityQueue<Integer> shorter;
 
-            int sizeDiff = _increasing.size() - _decreasing.size();
+            int sizeDiff = _bigs.size() - _smalls.size();
             if (Math.abs(sizeDiff) <= 1) {
                 return;
             }
             if (sizeDiff > 0) {
-                longer = _increasing;
-                shorter = _decreasing;
+                longer = _bigs;
+                shorter = _smalls;
             } else {
-                longer = _decreasing;
-                shorter = _increasing;
+                longer = _smalls;
+                shorter = _bigs;
             }
             Integer moveVal = longer.remove();
             shorter.add(moveVal);

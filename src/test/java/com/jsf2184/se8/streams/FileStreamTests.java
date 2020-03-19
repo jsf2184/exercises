@@ -26,9 +26,15 @@ public class FileStreamTests {
 
     @Test
     public void readFileWithStream() throws Exception {
-        File resourceFile = ResourceUtility.getResourceFile("lineFile.txt");
-        Stream<String> fileStream = Files.lines(resourceFile.toPath());
+        Stream<String> fileStream = getFileStream("lineFile.txt");
         fileStream.forEach(System.out::println);
     }
+
+    public static Stream<String> getFileStream(final String name) throws Exception {
+        File resourceFile = ResourceUtility.getResourceFile(name);
+        Stream<String> fileStream = Files.lines(resourceFile.toPath());
+        return fileStream;
+    }
+
 
 }

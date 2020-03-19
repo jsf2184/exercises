@@ -55,6 +55,8 @@ public class DeadlockAvoidanceByMinimizingCriticalCodeTests {
                 _balance -= amount;
                 System.out.printf("Account1 %s: paying %f to %s and now have %f\n", _name, amount, other.getName(), _balance);
             }
+            // This works well because we never try to hold on to one lock and acquire the other. We relinquish our
+            // lock first.
             other.receive(amount);
         }
         @Override
@@ -77,8 +79,10 @@ public class DeadlockAvoidanceByMinimizingCriticalCodeTests {
     }
 
     public void testDeadlock(BiFunction<String, Double, Account> factory, boolean shouldWork) {
+        // Alex and Zack both start with $100
         Account alex = factory.apply("alex", 100.0);
         Account zack = factory.apply("zack", 100.0);
+        // And each pays the other $10
         Thread alexThread = new Thread(() -> alex.pay(10.0, zack));
         Thread zackThread = new Thread(() -> zack.pay(10.0, alex));
 
@@ -92,6 +96,7 @@ public class DeadlockAvoidanceByMinimizingCriticalCodeTests {
             e.printStackTrace();
         }
 
+        // So if everything went right, they should still have $100
         if (shouldWork) {
             Assert.assertEquals(100.0, alex.getBalance(), .0001);
             Assert.assertEquals(100.0, zack.getBalance(), .0001);

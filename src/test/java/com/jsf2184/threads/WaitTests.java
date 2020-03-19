@@ -59,7 +59,7 @@ public class WaitTests {
     @Test
     public void testWait() {
         PubValue pubValue = new PubValue();
-        // On a single publishing thread, publish 10 times without an occasional slight 1 ms delay.
+        // On a single publishing thread, publish 10 times with an occasional slight 1 ms delay.
         new Thread(() -> IntStream.range(0, 10)
                 .forEach(x ->  {
                     pubValue.publish();

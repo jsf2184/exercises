@@ -50,6 +50,7 @@ public class ExplicitLockConcurrencyTests {
         public void run() {
             for (_successes = 0; _successes < _num; _successes++) {
                 Utility.sleep(2);
+                // note that bow has to complete successfully for successes to increment.
                 _originator.bow(_recipient);
             }
         }
@@ -157,13 +158,20 @@ public class ExplicitLockConcurrencyTests {
         alexThread.start();
         zackThread.start();
         try {
-            alexThread.join(500);
-            zackThread.join(500);
+            alexThread.join(2000);
+            zackThread.join(2000);
         } catch (Exception ignore) {
         }
+        int alexSuccesses = alexThread.getSuccesses();
+        int zackSuccesses = zackThread.getSuccesses();
         if (expectSuccess) {
-            Assert.assertEquals(attempts, alexThread.getSuccesses());
-            Assert.assertEquals(attempts, zackThread.getSuccesses());
+            Assert.assertEquals(attempts, alexSuccesses);
+            Assert.assertEquals(attempts, zackSuccesses);
+        } else {
+            System.out.printf("Got %d/%d alexSuccesses\n", alexSuccesses, attempts);
+            System.out.printf("Got %d/%d zackSuccesses\n", zackSuccesses, attempts);
+            Assert.assertTrue(alexSuccesses < attempts || zackSuccesses < attempts);
+
         }
     }
 

@@ -20,13 +20,40 @@ public class TwoDimArrayPlay {
     }
 
     public void printArray(int[][] array) {
-        Arrays.stream(array).map(Arrays::toString).forEach(System.out::println);
+        Arrays.stream(array)
+                .map(Arrays::toString)
+                .forEach(System.out::println);
+    }
+
+    public void printArray2(int[][] array)
+    {
+        for (int r = 0; r< array.length; r++) {
+            for (int c = 0; c< array[r].length; c++) {
+                System.out.printf("%d ", array[r][c]);
+            }
+            System.out.println();
+        }
     }
 
     @Test
     public void popAndPrintArray() {
         int[][] array = initArray();
         printArray(array);
+        printArray2(array);
     }
+
+    @Test
+    public void popAndPrintArrayWithConstants() {
+        int[][] array = {
+                {},
+                {10, 11},
+                {20, 21, 22, 23},
+                {30, 31, 32, 33, 34, 35},
+                {40, 41, 42, 43, 44, 45, 46, 47 }
+        };
+        printArray(array);
+        printArray2(array);
+    }
+
 
 }

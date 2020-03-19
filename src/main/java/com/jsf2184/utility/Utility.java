@@ -64,13 +64,13 @@ public class Utility {
 
     public static void permute(String prefix, String s, List<String> res) {
 
-
+        _permuteCount++;
         int length = s.length();
         if (length == 0) {
             res.add(prefix);
+            return;
         }
         for (int i=0; i<length; i++) {
-            _permuteCount++;
             char c = s.charAt(i);
             permute(prefix + c, splice(s, i), res);
         }

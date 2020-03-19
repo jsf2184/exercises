@@ -168,18 +168,21 @@ public class ByteBufferTests {
 
     @Test
     public void testIntoSeveralStrings() {
-        String s1 = "abcdefghi";
+        String s1 = "abc|def|ghi|jkl|mnop|qrst|uvwx|yz";
         ByteBuffer sut = ByteBuffer.allocate(s1.length());
         sut.put(s1.getBytes());
         sut.flip();
         StringBuilder sb = new StringBuilder();
         while (sut.hasRemaining()) {
-            int chunkSize = Math.min(sut.remaining(), 2);
+            int chunkSize = Math.min(sut.remaining(), 3);
             byte[] part = new byte[chunkSize];
             sut.get(part);
-            sb.append(new String(part));
+            String partStr = new String(part);
+            sb.append(partStr);
         }
-        Assert.assertEquals(s1, sb.toString());
+        String builtStr = sb.toString();
+        String[] parts = builtStr.split("\\|");
+        Assert.assertEquals(s1, builtStr);
 
     }
 
