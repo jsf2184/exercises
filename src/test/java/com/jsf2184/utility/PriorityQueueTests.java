@@ -40,6 +40,13 @@ public class PriorityQueueTests {
         int[] shuffle = Utility.shuffle(10);
         _log.info(String.format("input: %s", Arrays.toString(shuffle)));
         Arrays.stream(shuffle).boxed().forEach(sut::add);
+        _log.info("Iterate thru priorityQueue");
+        int i=1;
+        for (int v : sut) {
+            _log.info(String.format("[%d] = %d", i, v));
+            i++;
+        }
+        _log.info("remove all from priorityQueue");
         while (!sut.isEmpty()) {
             Integer v = sut.remove();
             _log.info("" + v);

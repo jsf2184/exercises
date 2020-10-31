@@ -20,6 +20,12 @@ public class Person {
     static List<Integer> popChildAges() {
         Random r = new Random();
         List<Integer> res = IntStream.range(0, 3).map(x -> r.nextInt(10)).boxed().collect(Collectors.toList());
+        List<Integer> res2 = IntStream
+                .range(0, 3)
+                .map(x -> r.nextInt(10))
+                .map(x-> x * 2)
+                .boxed()
+                .collect(Collectors.toList());
         return res;
     }
     public String getName() {

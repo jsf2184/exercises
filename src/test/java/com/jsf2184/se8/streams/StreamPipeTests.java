@@ -29,6 +29,9 @@ public class StreamPipeTests {
         Map<String, Integer> map = people
                 .stream()
                 .collect(Collectors.toMap(Person::getName, Person::getAge));
+        Map<String, Integer> map2 = people
+                .stream()
+                .collect(Collectors.toMap(p->p.getName(), p->p.getAge()));
         Assert.assertEquals(4, map.size());
         Assert.assertEquals(24, (int) map.get("Alex"));
         Assert.assertEquals(22, (int) map.get("Zack"));

@@ -1,7 +1,11 @@
 package com.jsf2184.se8.streams;
 
+import com.jsf2184.BlockingQueueTests;
 import com.jsf2184.se8.Employee;
 import com.jsf2184.se8.Person;
+import com.jsf2184.utility.LoggerUtility;
+import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -11,25 +15,33 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ParallelTests {
+
+    private static final Logger _log = Logger.getLogger(ParallelTests.class);
+
+    @BeforeClass
+    public static void setup()
+    {
+        LoggerUtility.initRootLogger();
+    }
+
+
     @Test
     public void testForkPoolSize() {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        System.out.println(forkJoinPool.getParallelism());
+        _log.info(String.format("forkJoinPool.getParallelism() = %d", forkJoinPool.getParallelism()));
     }
 
     Predicate<Employee> _filter = e -> {
         boolean res = e.getId() % 2 == 0;
-        System.out.printf("Filtering employee: %s, res=%s, thread: %s\n",
-                          e,
-                          res,
-                          Thread.currentThread().getName());
+        _log.info(String.format("Filtering employee: %s, res=%s",
+                                e,
+                                res));
         return res;
     };
 
     Function<Employee, Integer> _mapFunc = e -> {
-        System.out.printf("Mapping employee: %s, thread: %s\n",
-                          e,
-                          Thread.currentThread().getName());
+        _log.info(String.format("Mapping employee: %s",
+                          e));
         return e.getId();
 
     };
@@ -41,7 +53,7 @@ public class ParallelTests {
                 .parallel()
                 .filter(_filter)
                 .map(_mapFunc)
-                .forEach(System.out::println);
+                .forEach(v -> _log.info(String.format("terminal value: %d", v)) );
     }
 
     @Test

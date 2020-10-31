@@ -2,7 +2,6 @@ package com.jsf2184.socket;
 
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.net.Socket;
 
 public class StringClient extends  Client{

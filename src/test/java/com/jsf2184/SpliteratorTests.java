@@ -44,13 +44,17 @@ public class SpliteratorTests {
     }
 
     public void verifyCreateSpliterators(List<Integer> inputs, int depth) {
-        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(depth, inputs);
-        int divisor = (int) Math.pow(2, depth);
-        int expectedSize = inputs.size() / divisor;
+        // In our example we have an original list which is 131072 long. When we pass in a depth of 8, what we are
+        // saying is that we want to reduce its size in half 8 times for the entire list. That is, we want to
+        // divide it into pieces that are 2^8 = 256 smaller than the original. That would result in
+        // 131072 / 256 = 512 spliterators.
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithHelpFromStack(depth, inputs);
+        int divisor = (int) Math.pow(2, depth);  // 256
+        int expectedSize = inputs.size() / divisor;  // 131062
         spliterators.forEach(s -> Assert.assertEquals(expectedSize, s.getExactSizeIfKnown()));
     }
 
-    public static List<Spliterator<Integer>> createSpliteratorsWithStack(int depth, List<Integer> inputs) {
+    public static List<Spliterator<Integer>> createSpliteratorsWithHelpFromStack(int depth, List<Integer> inputs) {
         Stack<Spliterator<Integer>> stack = new Stack<>();
         Stack<Integer> depthStack = new Stack<>();
         List<Spliterator<Integer>> res = new ArrayList<>();
@@ -96,7 +100,7 @@ public class SpliteratorTests {
 
     @Test
     public void test512SpliteratorsSequentially() {
-        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(8, _inputs);
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithHelpFromStack(8, _inputs);
 
         int numSpliterators = spliterators.size();
         _log.info(String.format("There are %d spliterators", numSpliterators));
@@ -114,7 +118,7 @@ public class SpliteratorTests {
 
     @Test
     public void test512SpliteratorsParallel() throws InterruptedException {
-        List<Spliterator<Integer>> spliterators = createSpliteratorsWithStack(8, _inputs);
+        List<Spliterator<Integer>> spliterators = createSpliteratorsWithHelpFromStack(8, _inputs);
         int numSpliterators = spliterators.size();
 
         _log.info(String.format("There are %d spliterators", numSpliterators));

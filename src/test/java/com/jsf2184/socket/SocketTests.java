@@ -5,6 +5,7 @@ import com.jsf2184.utility.LoggerUtility;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SocketTests {
@@ -25,6 +26,7 @@ public class SocketTests {
     }
 
     @Test
+    @Ignore
     public void testClientConnects() {
         StringClient client = new StringClient("127.0.0.1", 9999);
         Assert.assertTrue(client.connect(3));
@@ -46,6 +48,7 @@ public class SocketTests {
 
 
     @Test
+    @Ignore
     public void testServer() {
         Server server = new Server(9999, StringClientHandler::new);
         server.run();
