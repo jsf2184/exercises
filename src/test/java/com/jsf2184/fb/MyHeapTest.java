@@ -20,7 +20,7 @@ public class MyHeapTest {
         addIt(heap, 23);
         addIt(heap, 11);
         addIt(heap, 18);
-        addIt(heap, 13);
+//        addIt(heap, 13);
         addIt(heap, 43);
         addIt(heap, 8);
         addIt(heap, 2);
@@ -31,6 +31,7 @@ public class MyHeapTest {
                 break;
             }
             log.info("popped = {}", popped);
+            heap.print();
         }
     }
 
@@ -59,33 +60,53 @@ public class MyHeapTest {
         }
 
         public Integer pop() {
-            if (size() == 0) {
+            final int last = numElements();
+            if (last == 0) {
                 return null;
             }
             int result = values.get(1);
-            int gap = 1;
-            int last = size();
-            while (gap <= last) {
-                int c1 = 2 * gap;
-                int c2 = c1 + 1;
-                Integer child1 = c1 <= last ? values.get(c1) : null;
-                Integer child2 = c2 <= last ? values.get(c2) : null;
-                if (child1 == null && child2 == null) {
-                    break;
-                }
-                if (child1 != null && (child2 == null || child1 < child2)) {
-                    values.set(gap, child1);
-                    gap = c1;
-                } else {
-                    values.set(gap, child2);
-                    gap = c2;
-                }
-            }
+            // put the last item in the first slot.
+            values.set(1, values.get(last));
+            // Now remove the last element
             values.remove(last);
+            // Now work that out of place element to where it belongs.
+            int current = 1;
+            Integer swapChild;
+            while ((swapChild = getSwapChild(current)) != null) {
+                swap(current, swapChild);
+                current = swapChild;
+            }
             return result;
         }
 
-        int size() {
+        Integer getSwapChild(int current) {
+            final int numElements = numElements();
+            if (current > numElements) {
+                return null;
+            }
+            Integer value = values.get(current);
+            int c1 = current * 2;
+            int c2 = current * 2+1;
+            Integer child1 = c1 > numElements ? null : values.get(c1);
+            Integer child2 = c2 > numElements ? null : values.get(c2);
+
+            if (child1 == null && child2 == null) {
+                return  null;
+            }
+            Integer candidateValue = value;
+            Integer candidateIndex = null;
+            if (child1 != null && child1 < candidateValue) {
+                candidateIndex = c1;
+                candidateValue = child1;
+            }
+            if (child2 != null && child2 < candidateValue) {
+                candidateIndex = c2;
+            }
+            return candidateIndex;
+        }
+
+
+        int numElements() {
             return values.size() -1;
         }
 
