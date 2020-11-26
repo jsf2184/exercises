@@ -12,7 +12,7 @@ public class Subset {
     }
     @Test
     public void testSubset2() {
-        subset2("abcd");
+        subsetRecursive("abcd");
     }
 
     public void subset(String s) {
@@ -35,21 +35,21 @@ public class Subset {
         }
     }
 
-    public void subset2(String s) {
+    public void subsetRecursive(String s) {
         ArrayList<String> results = new ArrayList<>();
-        subset2(s, results);
+        subsetRecursive(s, results);
         for (String subset : results) {
             System.out.println(subset);
         }
 
     }
-    public void subset2(String s, ArrayList<String> results) {
+    public void subsetRecursive(String s, ArrayList<String> results) {
         if (s.length() == 0) {
             results.add("");
             return;
         }
         char c = s.charAt(0);
-        subset2(s.substring(1), results);
+        subsetRecursive(s.substring(1), results);
         addToList(c, results);
     }
 }
