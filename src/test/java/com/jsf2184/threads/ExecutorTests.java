@@ -1,6 +1,5 @@
 package com.jsf2184.threads;
 
-import com.jsf2184.SpliteratorTests;
 import com.jsf2184.utility.LoggerUtility;
 import com.jsf2184.utility.Utility;
 import org.apache.log4j.Logger;
@@ -8,10 +7,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.rmi.CORBA.Util;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
@@ -63,14 +59,14 @@ public class ExecutorTests {
     public void testSingleThreadExecutorWithSubmits() throws InterruptedException {
         // A SingleThreadExecutor only uses one thread, so there are all done one at a time.
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        submit(executorService, 100, null);
+        submitAndWait(executorService, 100, null);
     }
 
     @Test
     public void testFixedThreadPoolWithSubmits() throws InterruptedException {
         // Now we use an ExecutorService that uses 5 threads at a time.
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        submit(executorService, 100, 19);
+        submitAndWait(executorService, 100, 19);
 
     }
 
@@ -78,7 +74,7 @@ public class ExecutorTests {
     public void testCachedThreadPoolWithSubmits() throws InterruptedException {
         // Now we use an ExecutorService that uses 5 threads at a time.
         ExecutorService executorService = Executors.newCachedThreadPool();
-        submit(executorService, 100, 19);
+        submitAndWait(executorService, 100, 19);
 
     }
 
@@ -89,14 +85,19 @@ public class ExecutorTests {
         submitFutures(executorService, 100);
     }
 
-    // Submit 'count' jobs to the ExecutorService. In this submit() method, our 'job' is basically that of a
-    // 'Runnable'. That is, it is just a void method, returning nothing. I use a Countdown latch to
+    // Submit 'count' jobs to the ExecutorService. In this submitAndWait() method, we submit 'count' number
+    // of jobs. Each 'job' is basically that of a 'Runnable'. That is, it is just a void method, returning nothing.
+    // So, we use an ExectuorService to launch all the jobs. Each job has access to the same CountdownLatch so
+    // it can signal that it is done. The CountDownLatch was initialized to 'count', so when it hits zero, all the
+    // launched little threads are done.
     //
-    public void submit(ExecutorService executorService,
-                       int count,
-                       Integer exceptionMod) throws InterruptedException
+    public void submitAndWait(ExecutorService executorService,
+                              int count,
+                              Integer exceptionMod) throws InterruptedException
     {
         CountDownLatch latch = new CountDownLatch(count);
+
+        // Launch all the jobs.
         HashMap<Integer, Future<?>> futures = new HashMap<>();
         IntStream.range(0, count).forEach(i -> {
             Job job = new Job(latch, i, exceptionMod);
@@ -104,13 +105,15 @@ public class ExecutorTests {
             Future<?> future = executorService.submit(job::run);
             futures.put(i, future);
         });
+
+        // Use the latch to wait for their completion.
         latch.await();
         executorService.shutdown();
-        for (Map.Entry<Integer, Future<?>> pair : futures.entrySet()) {
-            Integer i = pair.getKey();
+        for (Map.Entry<Integer, Future<?>> mapEntry : futures.entrySet()) {
+            Integer i = mapEntry.getKey();
             try {
                 // If there was a problem with a Job, a call to its future.get() would return an exception
-                Future<?> future = pair.getValue();
+                Future<?> future = mapEntry.getValue();
                 Object o = future.get();
                 Assert.assertNull(o);
             } catch (ExecutionException e) {
