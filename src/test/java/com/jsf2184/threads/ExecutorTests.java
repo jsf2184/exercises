@@ -1,25 +1,20 @@
 package com.jsf2184.threads;
 
-import com.jsf2184.utility.LoggerUtility;
 import com.jsf2184.utility.Utility;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
+@Slf4j
 public class ExecutorTests {
-    private static final Logger _log = Logger.getLogger(ExecutorTests.class);
-
-    @BeforeClass
-    public static void setup()
-    {
-        LoggerUtility.initRootLogger();
-    }
 
     public static class Job {
         CountDownLatch _latch;
@@ -118,7 +113,7 @@ public class ExecutorTests {
                 Assert.assertNull(o);
             } catch (ExecutionException e) {
                 Throwable causeException = e.getCause();
-                _log.warn(String.format("For value: %d, Caught ExecutionException: %s - %s",
+                log.warn(String.format("For value: %d, Caught ExecutionException: %s - %s",
                                         i,
                                         causeException.getClass().getSimpleName(),
                                         causeException.getMessage()));
@@ -153,14 +148,14 @@ public class ExecutorTests {
     @Test
     public void testFutureTimeout() {
         Callable<Integer> callable = () -> {
-            _log.info("Entered callable, wait 3 seconds");
+            log.info("Entered callable, wait 3 seconds");
             try {
-                Thread.sleep(3000);
+                TimeUnit.SECONDS.sleep(3);
             } catch (Exception e) {
-                _log.warn("Callable caught exception: ", e);
+                log.warn("Callable caught exception: ", e);
             }
             int res = 10;
-           _log.info("Exiting callable, after 3 seconds, returning: " + 10);
+           log.info("Exiting callable, after 3 seconds, returning: " + 10);
             return  res;
         };
         ExecutorService executorService = Executors.newFixedThreadPool(5);
@@ -168,26 +163,93 @@ public class ExecutorTests {
         try {
             Integer val = integerFuture.get(1, TimeUnit.SECONDS);
         } catch (Exception e) {
-            _log.info("In integerFuture.get(): Caught exception: " + e.getClass().getSimpleName());
+            log.info("In integerFuture.get(): Caught exception: " + e.getClass().getSimpleName());
         }
         executorService.shutdown();
-        _log.info("Wait for executorService to complete");
+        log.info("Wait for executorService to complete");
         try {
             executorService.awaitTermination(1, TimeUnit.SECONDS);
         } catch (Exception e) {
-            _log.warn("In executorService.awaitTermination(), caught exception: ", e);
+            log.warn("In executorService.awaitTermination(), caught exception: ", e);
         }
         if (executorService.isTerminated()) {
-            _log.info("ExecutorService graceful termination");
+            log.info("ExecutorService graceful termination");
         } else {
-            _log.info("ExecutorService forcing termination");
+            log.info("ExecutorService forcing termination");
             executorService.shutdownNow();
         }
-        _log.info("ExecutorService completed");
+        log.info("ExecutorService completed");
+    }
 
+    public static class Sum {
+        int v1;
+        int v2;
+        int sum;
 
+        public Sum(int v1, int v2) {
+            this.v1 = v1;
+            this.v2 = v2;
+        }
+
+        public Sum(Sum s1, Sum s2) {
+            this.v1 = s1.sum;
+            this.v2 = s2.sum;
+        }
+
+        public Sum calc() {
+            sleep(100);
+            sum = v1 + v2;
+            log.info("Added {} + {} = {}", v1, v2, sum);
+            return this;
+        }
 
     }
 
+
+
+
+    @Test
+    public void testParallelSum() throws ExecutionException, InterruptedException {
+        final int result = parallelSum(10);
+        Assert.assertEquals(55, result);
+    }
+
+    public static int parallelSum(int count) throws ExecutionException, InterruptedException {
+
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+
+        List<Future<Sum>> pendingSums = new ArrayList<>();
+        int start = count %2 == 0 ? 1 : 0;
+
+        for (int i=start; i<=count; i+=2) {
+            Sum sum = new Sum(i, i+1);
+            final Future<Sum> sumFuture = executorService.submit(sum::calc);
+            pendingSums.add(sumFuture);
+        }
+
+        int i=0;
+        while (true) {
+            final Future<Sum> sumFuture1 = pendingSums.get(i++);
+            final Sum sum1 = sumFuture1.get();
+            if (i >= pendingSums.size()) {
+                return sum1.sum;
+            }
+            final Future<Sum> sumFuture2 = pendingSums.get(i++);
+            final Sum sum2 = sumFuture2.get();
+            final Sum next = new Sum(sum1, sum2);
+            final Future<Sum> nextFuture = executorService.submit(next::calc);
+            pendingSums.add(nextFuture);
+        }
+    }
+
+
+    public static void sleep(int ms) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(ms);
+        } catch (Exception e) {
+        }
+    }
+    
+    
 
 }
