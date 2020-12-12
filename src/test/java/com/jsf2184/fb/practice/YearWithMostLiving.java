@@ -1,11 +1,13 @@
 package com.jsf2184.fb.practice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
+@Slf4j
 public class YearWithMostLiving {
     public static class Lifespan {
         int birthYear;
@@ -21,15 +23,22 @@ public class YearWithMostLiving {
     public void testIt() {
         List<Lifespan> lives = Arrays.asList(new Lifespan(2000, 2003),
                                              new Lifespan(2002, 2005),
-                                             new Lifespan(2003, 2003));
-        Assert.assertEquals(2003, getYearWithMostLiving(lives));
-        Assert.assertEquals(2003, getYearWithMostLiving2(lives));
+                                             new Lifespan(1999, 2005),
+                                             new Lifespan(2006, 2025),
+                                             new Lifespan(2008, 2015),
+                                             new Lifespan(2009, 2015),
+                                             new Lifespan(2012, 2019),
+                                             new Lifespan(2011, 2013));
+        int result1 = getYearWithMostLiving(lives);
+        int result2 = getYearWithMostLiving2(lives);
+        log.info("Result1 = {}, Result2 = {}", result1, result2);
+        Assert.assertEquals(2003, result1, result2);
 
     }
 
     public static int getYearWithMostLiving(List<Lifespan> lives) {
         int earliestYear = 1900;
-        int lastYear = 2020;
+        int lastYear = 2040;
         int[] counts = new int[(lastYear-earliestYear)];
         for (Lifespan lifespan : lives) {
             for (int year = lifespan.birthYear; year <= lifespan.deathYear; year++ ) {
@@ -50,36 +59,28 @@ public class YearWithMostLiving {
 
 
     public static int getYearWithMostLiving2(List<Lifespan> lives) {
-        TreeMap<Integer, Integer> birthYears = new TreeMap<>();
-        TreeMap<Integer, Integer> deathYears = new TreeMap<>();
+        TreeMap<Integer, Integer> eventYears = new TreeMap<>();
 
         for(Lifespan lifespan :lives) {
-            Integer yearCount = birthYears.computeIfAbsent(lifespan.birthYear, k -> 0);
+            Integer yearCount = eventYears.computeIfAbsent(lifespan.birthYear, k -> 0);
             yearCount++;
-            birthYears.put(lifespan.birthYear, yearCount);
-            yearCount = deathYears.computeIfAbsent(lifespan.deathYear+1, k -> 0);
-            yearCount++;
-            deathYears.put(lifespan.deathYear+1, yearCount);
+            eventYears.put(lifespan.birthYear, yearCount);
+            yearCount = eventYears.computeIfAbsent(lifespan.deathYear+1, k -> 0);
+            yearCount--;
+            eventYears.put(lifespan.deathYear+1, yearCount);
         }
 
         int runningPopulation = 0;
         int highestPopulation = 0;
         int highestYear = 0;
-        while(!deathYears.isEmpty()) {
-            Integer nextBirthYear = birthYears.isEmpty() ? null : birthYears.firstKey();
-            int nextDeathYear = deathYears.firstKey();
-
-            int nextYear = nextBirthYear == null ? nextDeathYear : Math.min(nextBirthYear, nextDeathYear);
-
-            if (nextBirthYear != null && nextBirthYear == nextYear) {
-                runningPopulation += birthYears.remove(nextBirthYear);
-            }
-            if (nextDeathYear == nextYear) {
-                runningPopulation -= deathYears.remove(nextDeathYear);
-            }
+        while(!eventYears.isEmpty()) {
+            Map.Entry<Integer, Integer> event = eventYears.pollFirstEntry();
+            Integer year = event.getKey();
+            Integer delta = event.getValue();
+            runningPopulation += delta;
             if (runningPopulation > highestPopulation) {
                 highestPopulation = runningPopulation;
-                highestYear = nextYear;
+                highestYear = year;
             }
         }
         return highestYear;
