@@ -2,12 +2,20 @@ package com.jsf2184.dnb.parse.errors.matcher;
 
 public class KeyWordMatcher implements IKeyWordMatcher {
 
-    SimpleKeyWordMatcher simpleKeyWordMatcher;
-    ApproximateKeyWordMatcher approximateKeyWordMatcher;
+    IKeyWordMatcher simpleKeyWordMatcher;
+    IKeyWordMatcher approximateKeyWordMatcher;
 
-    public KeyWordMatcher(SimpleKeyWordMatcher simpleKeyWordMatcher, ApproximateKeyWordMatcher approximateKeyWordMatcher) {
+    // Constructor for dependency injection
+    public KeyWordMatcher(IKeyWordMatcher simpleKeyWordMatcher, IKeyWordMatcher approximateKeyWordMatcher) {
         this.simpleKeyWordMatcher = simpleKeyWordMatcher;
         this.approximateKeyWordMatcher = approximateKeyWordMatcher;
+    }
+
+    // Constructor for convenience
+
+
+    public KeyWordMatcher() {
+        this(new SimpleKeyWordMatcher(), new ApproximateKeyWordMatcher());
     }
 
     @Override

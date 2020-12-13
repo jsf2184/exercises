@@ -1,4 +1,4 @@
-package com.jsf2184.dnb.parse;
+package com.jsf2184.dnb.parse.errors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,7 +27,7 @@ public class WordGenerator {
      * @param input - an input string
      * @return a List of words produced by the 2 phased split.
      */
-    List<String> generateWords(String input) {
+    public List<String> generateWords(String input) {
         // first break our string into words based simply on our delimers
         final List<String> delimSplit = delimSplit(input);
         // And now use the transitions of characterTypes within the words to generate
@@ -73,7 +73,6 @@ public class WordGenerator {
     public static List<String> splitWordListOnTransitions(List<String> words) {
         List<String > results = new ArrayList<>();
         words.forEach(w -> {
-            results.add(w);
             splitWordOnTransitions(w, results);
         });
         return results;
@@ -91,9 +90,12 @@ public class WordGenerator {
      *                words list
      */
     public static void splitWordOnTransitions(String word, List<String> words) {
-        if (word == null) {
+        if (StringUtils.isEmpty(word)) {
             return;
         }
+
+        // put the original on the list.
+        words.add(word);
 
         StringBuilder wordBuf = new StringBuilder();
         int consecUppers = 0;
@@ -136,9 +138,13 @@ public class WordGenerator {
             // whether we started a new word, or we are just adding on to an existing word, add our latest char.
             wordBuf.append(c);
         }
-        if (wordBuf.length() > 0) {
-            words.add(wordBuf.toString());
-        }
 
+        // Add the leftover provided it isn't the whole original word
+        if (wordBuf.length() > 0) {
+            String leftover = wordBuf.toString();
+            if (!word.equals(leftover)) {
+                words.add(leftover);
+            }
+        }
     }
 }

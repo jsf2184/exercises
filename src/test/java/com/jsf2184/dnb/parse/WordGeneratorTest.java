@@ -1,5 +1,6 @@
 package com.jsf2184.dnb.parse;
 
+import com.jsf2184.dnb.parse.errors.WordGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,11 +16,12 @@ public class WordGeneratorTest {
     public void testGenerateWords() {
         runGenerateWords(null, Collections.emptyList());
         runGenerateWords("", Collections.emptyList());
-        runGenerateWords("2applePies,,,,  goodAndSweet AND0Errors",
+        runGenerateWords("2applePies,,,,  goodAndSweet AND0Errors abc",
                          Arrays.asList(
                                  "2applePies", "2", "apple", "Pies",
                                  "goodAndSweet", "good", "And", "Sweet",
-                                 "AND0Errors", "AND", "0", "Errors"
+                                 "AND0Errors", "AND", "0", "Errors",
+                                 "abc"
                          ));
     }
 
@@ -48,23 +50,27 @@ public class WordGeneratorTest {
         runSplitWordOnTransitions("aaa", Collections.singletonList("aaa"));
         runSplitWordOnTransitions("A", Collections.singletonList("A"));
         runSplitWordOnTransitions("AAA", Collections.singletonList("AAA"));
-        runSplitWordOnTransitions("theGoodDOGisGoingHomeTODAY", Arrays.asList("the", "Good", "DOG", "is", "Going", "Home", "TODAY"));
-        runSplitWordOnTransitions("0aA00aaAAabcAbc0", Arrays.asList("0", "a", "A", "00", "aa", "AA", "abc", "Abc", "0"));
+        runSplitWordOnTransitions("theGoodDOGisGoingHomeTODAY",
+                                  Arrays.asList("theGoodDOGisGoingHomeTODAY", "the", "Good", "DOG", "is", "Going", "Home", "TODAY"));
+        runSplitWordOnTransitions("0aA00aaAAabcAbc0",
+                                  Arrays.asList("0aA00aaAAabcAbc0", "0", "a", "A", "00", "aa", "AA", "abc", "Abc", "0"));
         runSplitWordOnTransitions("THEcowJumpedOVERtheMoonI",
-                                  Arrays.asList("THE", "cow", "Jumped", "OVER", "the", "Moon", "I"));
+                                  Arrays.asList("THEcowJumpedOVERtheMoonI", "THE", "cow", "Jumped", "OVER", "the", "Moon", "I"));
         runSplitWordOnTransitions("00THE1cow22Jumped0OVERtheMoonI3",
-                                  Arrays.asList("00", "THE", "1", "cow", "22", "Jumped", "0", "OVER", "the", "Moon", "I", "3"));
+                                  Arrays.asList("00THE1cow22Jumped0OVERtheMoonI3", "00", "THE", "1", "cow", "22", "Jumped", "0", "OVER", "the", "Moon", "I", "3"));
     }
 
     @Test
     public void testSplitWordListOnTransitions() {
-        // Running on a list of 2 input strings should produce one larger result that has the split words derived from each of the
+        // Running on a list of 3 input strings should produce q result that has the split words derived from each of the
         // originals (plus the originals)
 
         runSplitWordListOnTransitions(Arrays.asList("theGoodDOGisGoingHomeTODAY",
-                                                    "00THE1cow22Jumped0OVERtheMoonI3"),
+                                                    "00THE1cow22Jumped0OVERtheMoonI3",
+                                                    "simple"),
                                       Arrays.asList("theGoodDOGisGoingHomeTODAY", "the", "Good", "DOG", "is", "Going", "Home", "TODAY",
-                                                    "00THE1cow22Jumped0OVERtheMoonI3","00", "THE", "1", "cow", "22", "Jumped", "0", "OVER", "the", "Moon", "I", "3"));
+                                                    "00THE1cow22Jumped0OVERtheMoonI3","00", "THE", "1", "cow", "22", "Jumped", "0", "OVER", "the", "Moon", "I", "3",
+                                                    "simple"));
     }
 
     public void runDelimSplit(String input, List<String> expected) {
