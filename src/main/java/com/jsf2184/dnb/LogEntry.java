@@ -1,6 +1,8 @@
 package com.jsf2184.dnb;
 
-public class LogEntry {
+import com.jsf2184.dnb.utility.TimeMapper;
+
+public class LogEntry  {
     long timestamp;
     String className;
     String message;
@@ -13,6 +15,10 @@ public class LogEntry {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public String getTimestampString() {
+        return TimeMapper.toDateString(timestamp);
     }
 
     public String getClassName() {

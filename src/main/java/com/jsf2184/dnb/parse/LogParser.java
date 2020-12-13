@@ -1,4 +1,4 @@
-package com.jsf2184.dnb.parse.errors;
+package com.jsf2184.dnb.parse;
 
 import com.jsf2184.dnb.LogEntry;
 import com.jsf2184.dnb.utility.TimeMapper;
@@ -16,7 +16,7 @@ public class LogParser {
     public LogParser() {
     }
 
-    LogEntry parseLogEntry(String line, int lineNumber) {
+    public LogEntry parseLogEntry(String line, int lineNumber) {
         int lineLength = line == null ? 0 : line.length();
         if (lineLength < MIN_LINE_LENGTH) {
             log.warn("Log line on lineNumber: {} has length {} which is less than the minimum of {}",

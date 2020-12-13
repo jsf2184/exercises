@@ -1,16 +1,15 @@
 package com.jsf2184.dnb.parse.errors;
 
 import com.jsf2184.dnb.LogEntry;
+import com.jsf2184.dnb.parse.LogParser;
 import com.jsf2184.dnb.utility.TimeMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class LogParserTest {
 
     private static final String TIMESTAMP = "2020-04-01 10:10:04";
-    private static final Long TIMESTAMP_SECONDS = TimeMapper.toDateSeconds(TIMESTAMP);
+    public  static final Long TIMESTAMP_SECONDS = TimeMapper.toDateSeconds(TIMESTAMP);
     LogParser logParser = new LogParser();
 
     @Test
