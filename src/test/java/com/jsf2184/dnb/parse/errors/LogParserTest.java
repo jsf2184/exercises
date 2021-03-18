@@ -38,6 +38,5 @@ public class LogParserTest {
     private  void validateParse(String line, LogEntry expected) {
         LogEntry logEntry = logParser.parseLogEntry(line, 1);
         Assert.assertEquals(expected, logEntry);
-
     }
 }

@@ -12,7 +12,10 @@ public class PrimeGeneratorTests {
         final List<Integer> sumPrimes = generatorBySums.getPrimes(100);
         IPrimeGenerator generatorByMod = new PrimeGeneratorViaMod();
         final List<Integer> modPrimes = generatorByMod.getPrimes(100);
+        IPrimeGenerator generatorInefficient = new InefficientPrimeGenerator();
         Assert.assertEquals(sumPrimes, modPrimes);
+        final List<Integer> inefficientPrimes = generatorInefficient.getPrimes(100);
+        Assert.assertEquals(sumPrimes, inefficientPrimes);
         sumPrimes.forEach(System.out::println);
     }
 }

@@ -1,7 +1,9 @@
 package com.jsf2184.dnb.utility;
 
-import java.io.BufferedReader;
+import lombok.extern.slf4j.Slf4j;
 
+
+@Slf4j
 public class ArgParser {
 
     public static final String DEFAULT_INPUT_FILE = "applicaton.log";
@@ -53,6 +55,14 @@ public class ArgParser {
                         printUsage();
                         return false;
                     }
+                    Integer value = getInteger(args[++i]);
+                    if (value == null) {
+                        System.err.printf("Invalid -n argument: %s\n", args[i]);
+                        printUsage();
+                        return false;
+                    }
+                    lineOffset = value;
+                    break;
 
                 default:
                     System.err.printf("Unexpected argument: %s\n", arg);
@@ -62,8 +72,20 @@ public class ArgParser {
             }
         }
 
-
+        log.info("ArgumentSummary");
+        log.info("  inputFileName  = {}", inputFileName);
+        log.info("  outputFileName = {}", outputFileName);
+        log.info("  lineOffset     = {}", lineOffset);
+        log.info("");
         return true;
+    }
+
+    public static Integer getInteger(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
 

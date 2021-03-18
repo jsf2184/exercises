@@ -2,6 +2,7 @@ package com.jsf2184.dnb;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.jsf2184.dnb.io.output.JsonPrinter;
 import org.junit.Assert;
 import org.junit.Test;
 

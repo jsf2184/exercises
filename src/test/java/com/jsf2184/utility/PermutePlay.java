@@ -10,7 +10,8 @@ import java.util.Stack;
 
 public class PermutePlay {
 
-    public static String pullOne(int index, String input) {
+    @SuppressWarnings("ConstantConditions")
+    public static String oldPullOne(int index, String input) {
         final int length = input == null ? 0 : input.length();
         if (index >= length) {
             return null;
@@ -24,6 +25,19 @@ public class PermutePlay {
         String result = pre+post;
         return result;
     }
+
+    public static String pullOne(int index, String input) {
+        final int length = input == null ? 0 : input.length();
+        if (index >= length) {
+            return null;
+        }
+        String pre = input.substring(0, index);
+
+        String post = input.substring(index+1);
+        String result = pre+post;
+        return result;
+    }
+
 
     @Test
     public void testPullOne() {

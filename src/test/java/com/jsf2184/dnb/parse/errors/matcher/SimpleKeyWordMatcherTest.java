@@ -10,7 +10,7 @@ public class SimpleKeyWordMatcherTest {
 
     @Test
     public void matchWord() {
-        final List<KeyWordEnumTest.Expectation> expectationList = KeyWordEnumTest.getExpectationList();
+        final List<KeyWordExpectation> expectationList = KeyWordExpectation.getExpectationList();
         expectationList.forEach( exp -> runMatchWord(exp.getInput(), exp.getExpected()) );
     }
 

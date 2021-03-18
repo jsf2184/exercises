@@ -31,6 +31,7 @@ public class SievePractice {
     @Test
     public void testGetPrimeFactors() {
         Worker worker = new Worker(100);
+        Assert.assertEquals(Arrays.asList(5), worker.getPrimeFactors(5));
         Assert.assertEquals(Arrays.asList(2, 7, 7), worker.getPrimeFactors(98));
         Assert.assertEquals(Arrays.asList(97), worker.getPrimeFactors(97));
         Assert.assertEquals(Arrays.asList(2, 2, 17), worker.getPrimeFactors(68));
@@ -69,17 +70,23 @@ public class SievePractice {
         public static List<Integer> getPrimeFactors(int n, int[] lfa) {
             List<Integer> res = new ArrayList<>();
 
+            // The loop continues until 'n' is a prime number.
             while (lfa[n] != 0) {
                 int factor = lfa[n];
                 res.add(factor);
                 n = n / factor;
             }
+            // Add that last prime number to our result.
             res.add(n);
             return res;
         }
     }
 
 
+
+    // The Lowest factor array that we are building popululates arr[i] as follows...
+    // arr[i] : 0, if 'i' is a prime number
+    // arr[i]   p, where 'p' is the smallest prime factor of 'i'
 
     public static int[] createLowestFactorArray(int n) {
         int[] res = new int[n+1];

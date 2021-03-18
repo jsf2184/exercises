@@ -1,13 +1,16 @@
-package com.jsf2184.dnb;
+package com.jsf2184.dnb.io.output;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.jsf2184.dnb.LogEntry;
+import com.jsf2184.dnb.LogEntryWindow;
 import com.jsf2184.dnb.utility.TimeMapper;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
