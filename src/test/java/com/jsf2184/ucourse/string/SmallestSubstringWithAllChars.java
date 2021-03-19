@@ -99,7 +99,6 @@ public class SmallestSubstringWithAllChars {
         int deficientCount;
         String N;
         Integer start;
-        Integer finishIndex;
         String best;
 
         public Solution(String N, String K) {
@@ -112,7 +111,6 @@ public class SmallestSubstringWithAllChars {
             }
             deficientCount = desiredChars.keySet().size();
             start = null;
-            finishIndex = null;
             best = null;
         }
 
@@ -134,24 +132,21 @@ public class SmallestSubstringWithAllChars {
                 if (wasDeficient && (!charWasSatisfied && charIsSatsified)) {
                     // transitioned from a deficient char to a satisfied char.
                     deficientCount--;
-                    if (deficientCount == 0) {
-                        finishIndex = i;
-                    }
                 }
                 boolean isDeficient = deficientCount > 0;
                 log.info("N[{}]={} deficientCount={}, wasDeficient={}, isDeficient={}, ", i, c, deficientCount, wasDeficient, isDeficient);
 
                 if (!isDeficient) {
                     if (wasDeficient) {
-                        best = N.substring(start, finishIndex+1);
-                        log.info("First solution obtained: start={}, finish={}, interimSolution={}", start, finishIndex,best);
+                        best = N.substring(start, i+1);
+                        log.info("First solution obtained: start={}, finish={}, interimSolution={}", start, i,best);
                     }
                     if (compress(i)) {
-                        final String possibility = N.substring(start, finishIndex + 1);
-                        log.info("Possible solution obtained: start={}, finish={}, possibility={}", start, finishIndex, possibility);
+                        final String possibility = N.substring(start, i + 1);
+                        log.info("Possible solution obtained: start={}, finish={}, possibility={}", start, i, possibility);
                         if (possibility.length() < best.length()) {
                             best = possibility;
-                            log.info("Possible solution is best so far: start={}, finish={}, best={}", start, finishIndex, best);
+                            log.info("Possible solution is best so far: start={}, finish={}, best={}", start, i, best);
                         }
                     }
                 }
@@ -175,7 +170,6 @@ public class SmallestSubstringWithAllChars {
             }
             if (i > start) {
                 start = i;
-                finishIndex = end;
                 return true;
             }
             return false;
