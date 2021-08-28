@@ -18,4 +18,30 @@ public class PrimeGeneratorViaSums implements IPrimeGenerator {
         }
         return result;
     }
+
+    // Developed this optimization in Avenue8 coding interview
+    static List<Integer> findPrimes2(int n) {
+        List<Integer> primes = new ArrayList<>();
+
+        boolean[] dflags = new boolean[n+1];  // false means prime (or not divisible)
+        for (int i=2; i<=n; i++) {
+
+            if (!dflags[i]) {
+                primes.add(i);
+
+                long square = (long) i * (long ) i;
+                if (square < n) {
+                    for (int j = (int) square; j <= n; j += i) {
+                        dflags[j] = true;
+                    }
+                }
+            }
+
+        }
+
+        return primes;
+
+    }
+
+
 }

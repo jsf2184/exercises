@@ -124,33 +124,26 @@ public class SmallestSubstringWithAllChars {
                 if (start == null) {
                     start = i;
                 }
-                boolean wasDeficient = deficientCount > 0;
+
                 boolean charWasSatisfied = charRecord.isSatisfied();
                 charRecord.incActual();
                 boolean charIsSatsified = charRecord.isSatisfied();
-
+                boolean wasDeficient = deficientCount > 0;
                 if (wasDeficient && (!charWasSatisfied && charIsSatsified)) {
                     // transitioned from a deficient char to a satisfied char.
                     deficientCount--;
                 }
                 boolean isDeficient = deficientCount > 0;
                 log.info("N[{}]={} deficientCount={}, wasDeficient={}, isDeficient={}, ", i, c, deficientCount, wasDeficient, isDeficient);
-
+                compress(i);
                 if (!isDeficient) {
-                    if (wasDeficient) {
-                        best = N.substring(start, i+1);
-                        log.info("First solution obtained: start={}, finish={}, interimSolution={}", start, i,best);
-                    }
-                    if (compress(i)) {
-                        final String possibility = N.substring(start, i + 1);
-                        log.info("Possible solution obtained: start={}, finish={}, possibility={}", start, i, possibility);
-                        if (possibility.length() < best.length()) {
-                            best = possibility;
-                            log.info("Possible solution is best so far: start={}, finish={}, best={}", start, i, best);
-                        }
+                    final int endIndex = i + 1;
+                    int newLen = endIndex-start;
+                    if (best == null || newLen < best.length()) {
+                        best = N.substring(start, endIndex);
+                        log.info("Current solution is best so far: start={}, finish={}, best={}", start, i, best);
                     }
                 }
-
             }
             return best;
         }
