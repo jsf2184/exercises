@@ -32,6 +32,12 @@ public class StreamPipeTests {
         Map<String, Integer> map2 = people
                 .stream()
                 .collect(Collectors.toMap(p->p.getName(), p->p.getAge()));
+
+
+        Map<String, Person> map3 = people
+                .stream()
+                .collect(Collectors.toMap(Person::getName, p->p));
+
         Assert.assertEquals(4, map.size());
         Assert.assertEquals(24, (int) map.get("Alex"));
         Assert.assertEquals(22, (int) map.get("Zack"));
@@ -49,7 +55,8 @@ public class StreamPipeTests {
             return p.getAge() < 30;
         });
         System.out.println("Done Creating filtered Stream");
-        filteredStream.forEach(System.out::println);
+//        filteredStream.forEach(System.out::println);
+        filteredStream.forEach(p -> System.out.printf("match: %s\n", p.toString()));
     }
 
     @Test
@@ -66,7 +73,8 @@ public class StreamPipeTests {
     public void testIntegerMapAndSum() {
         List<Person> people = Person.createPersonList();
         // Note that it returned a stream of Integer objects
-        int res = people.stream().map(Person::getAge).mapToInt(Integer::intValue).sum();
+//        int res = people.stream().map(Person::getAge).mapToInt(Integer::intValue).sum();
+        int res = people.stream().mapToInt(Person::getAge).sum();
         System.out.printf("total age of all people: %d\n", res);
     }
 
@@ -90,6 +98,13 @@ public class StreamPipeTests {
         sum.ifPresent(integer -> System.out.printf("total age of all people: %d\n", integer));
         Integer total = sum.orElse(0);
         System.out.printf("total age of all people: %d\n", total);
+    }
+
+    @Test
+    public void simpleStream() {
+        final List<Integer> list = IntStream.range(0, 3).boxed().collect(Collectors.toList());
+        final List<Integer> list2 = list.stream().map(v -> 2 * v).collect(Collectors.toList());
+        list2.forEach(v -> System.out.printf("%s\n", v));
     }
 
 

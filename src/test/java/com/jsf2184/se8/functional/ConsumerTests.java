@@ -43,7 +43,8 @@ public class ConsumerTests {
         int a[] = new int[1];
         a[0] = 2;
 
-        Consumer<Integer> plus = (x -> {a[0] += x;});
+//        Consumer<Integer> plus = (x -> {a[0] += x;});
+        Consumer<Integer> plus = (x -> a[0] += x);
         Consumer<Integer> times = (x -> {a[0] *= x;});
 
         callConsumer(plus.andThen(times), 3); // (2+3) * 3 = 15
